@@ -27,33 +27,31 @@
     // $nom=$_POST['nom'];
     // $prenom= $_POST['prenom'];
     // echo 'bonjour ' .$nom. ' '.$prenom ;
+    $mention=array('Excellent', 'Tres Bien', 'Bien', 'Assez Bien', 'Passable', 'Pas de Mention');
+    $decision=['ADMIS','ELIMINE'];
+    echo $decision[0]; 
+    echo $mention[0];
 
     if (!empty($_POST['note'])) {
-        echo 'vous avez saisi une note';
+        // echo 'vous avez saisi une note';
         if ($_POST['note'] >= 17) {
-            echo '<div class="alert alert-primary" role="alert">
-                Excellent!
-              </div> ';
-        } else if ($_POST['note'] >= 16) {
-            echo '<div class="alert alert-secondary" role="alert">
-            Tres Bien
-            </div>';
-        } else if ($_POST['note'] >= 14) {
             echo '<div class="alert alert-success" role="alert">
-            Bien!
-          </div>';
+                '.$mention[0].', vous etes '.$decision[0].'! </div> ';
+        } else if ($_POST['note'] >= 16) {
+            echo '<div class="alert alert-primary" role="alert">
+            '.$mention[1].', vous etes '.$decision[0].'! </div> ';
+        } else if ($_POST['note'] >= 14) {
+            echo '<div class="alert alert-secondary" role="alert">
+            '.$mention[2].', vous etes '.$decision[0].'! </div> ';
         } else if ($_POST['note'] >= 12) {
             echo '<div class="alert alert-info" role="alert">
-            Assez bien!
-          </div>';
+            '.$mention[3].', vous etes '.$decision[0].'! </div> ';
         } else if ($_POST['note'] >= 10) {
-            echo '<div class="alert alert-light" role="alert">
-            Passabble
-          </div>';
-        } else {
             echo '<div class="alert alert-warning" role="alert">
-            Mauvaise note!
-          </div>';
+            '.$mention[4].', vous etes '.$decision[0].'! </div> ';
+        } else {
+            echo '<div class="alert alert-danger" role="alert">
+            '.$mention[5].', vous etes '.$decision[1].'! </div> ';
         }
     } else {
         echo '<div class="alert alert-danger" role="alert">
