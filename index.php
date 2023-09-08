@@ -29,8 +29,8 @@
     // echo 'bonjour ' .$nom. ' '.$prenom ;
     $mention=array('Excellent', 'Tres Bien', 'Bien', 'Assez Bien', 'Passable', 'Pas de Mention');
     $decision=['ADMIS','ELIMINE'];
-    echo $decision[0]; 
-    echo $mention[0];
+    // echo $decision[0]; 
+    // echo $mention[0];
 
     if (!empty($_POST['note'])) {
         // echo 'vous avez saisi une note';
