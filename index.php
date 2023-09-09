@@ -29,8 +29,22 @@
     // echo 'bonjour ' .$nom. ' '.$prenom ;
     $mention=array('Excellent', 'Tres Bien', 'Bien', 'Assez Bien', 'Passable', 'Pas de Mention');
     $decision=['ADMIS','ELIMINE'];
-    // echo $decision[0]; 
-    // echo $mention[0];
+    
+    //  print_r($decision) ;
+    // print_r($mention);
+
+  // Affichage des valeurs d'un tableau
+    // foreach($decision as $valeur) 
+    // {  
+    //     echo $valeur ,'<br/>';
+    // }
+
+    
+    //  // Affichage des valeurs d'un tableau
+    // foreach($mention as $valeur) 
+    // {  
+    //     echo $valeur ,'<br/>';
+    // }
 
     if (!empty($_POST['note'])) {
         // echo 'vous avez saisi une note';
@@ -59,7 +73,10 @@
       </div>';
     }
     ?>
+
+
     </div>
+
 </body>
 
 </html>
