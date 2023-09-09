@@ -1,0 +1,367 @@
+L'opérateur ternaire
+L'opérateur ternaire permet de raccourcir la syntaxe de la structure
+de contrôle if else comme ceci:
+
+(condition) ? (traitement1) : (traitement2)
+
+Si la condition est vraie alors on fait le traitement1,
+sinon (la condition n'est pas vraie) alors on fait le traitement2.
+
+
+<?php
+$a = 1;
+echo ($a % 2 == 0) ? ('$a est paire') : ('$a est impaire');
+?>
+
+switch case
+
+<?php
+$a = 1;
+switch ($a) {
+    case 1:
+        echo "Un";
+        break;
+    case 2:
+        echo "Deux";
+        break;
+    default:
+        echo "Autre";
+}
+?>
+
+La boucle for permet de faire un traitement d'une manière répétitif
+tant que la condition associée est vraie
+
+<?php
+for ($i = 0; $i < 10; $i++) {
+    echo "Bonjour<br />";
+}
+?>
+
+A l'instar de la boucle for, la boucle while permet de faire un traitement répétitif.
+En se servant de cette structure, le code précédent peut devenir:
+
+<?php
+$i = 0;
+while ($i < 10) {
+    echo "Bonjour<br />"; //affiche "Bonjour" 10 fois
+    $i++;
+}
+?>
+
+La structure do while ressemble beaucoup à la structure while sauf que
+le test de la condition est placé après le traitement et non pas avant.
+Par conséquent, la première itération est toujours exécutée.
+
+Avec la structure do While le code précédent devient:
+<?php
+$i = 0;
+do {
+    echo "Bonjour<br />";
+    $i++;
+} while ($i < 10);
+?>
+
+Mots-clés break et continue
+Le mot clé break permet de mettre fin à une boucle prématurément.
+Si la boucle doit normalement exécuter toutes les itérations qui satisfont
+la condition décrite, l'arrêt prématuré survient avant la sa fin normale.
+
+<?php
+for ($i = 0; $i < 10; $i++) {
+    if ($i == 5)
+        break;
+    echo "Bonjour<br />";
+}
+?>
+
+Dans ce cas, la boucle est censée afficher le message "Bonjour" 10 fois,
+mais le fait de placer le mot clé break après la condition if($i==5),
+arrête le programme au bout de 5 premières itérations.
+
+Le mot-clé continue permet d'ignorer l'itération courante est passer immédiatement
+à l'itération suivante.
+
+<?php
+for ($i = 0; $i < 10; $i++) {
+    if ($i == 5)
+        continue;
+    echo "$i<br />";  //0 1 2 3 4 6 7 8 9
+}
+?>
+
+Vous avez certainement remarqué l'absence du nombre 5.
+Le mot-clé continue cesse l'itération en cours (qui correspond à $i=5)
+et passe immédiatement à l'itération suivante ($i=6).
+
+
+Variables $_POST et $_GET
+
+La variables $_POST est en réalité un tableau associatif,
+c'est à dire un tableau qui utilise des clés au lieux d'indexes
+
+$_POST et $_GET sont des variables superglobales, c'est à dire qu'elles sont reconnues
+dans n'importe quel contexte (à l'intérieur des fonctions comme à l'extérieur,
+voir même à l'intérieur des méthodes d'une classe dans le cas de PHP5 par exemple).
+
+<?php
+@$prenom = $_POST["prenom"];
+@$valider = $_POST["valider"];
+$message = "";
+if (isset($valider)) {
+    if (empty($prenom))
+        $message = '<font color="#FF0000">Prénom invalide.</font>';
+    else
+        $message = '<font color="#00FF00">Prénom valide.</font>';
+}
+?>
+<!DOCYPT html>
+    <html>
+
+    <head>
+        <meta charset="UTF-8" />
+    </head>
+
+    <body>
+        <form method="post" action="">
+            <input type="text" name="prenom" /><br />
+            <input type="submit" name="valider" value="Vérifier" />
+        </form>
+        <?php
+        echo $message;
+        ?>
+    </body>
+
+    </html>
+
+    Expliquons un peu ce code:
+    Les deux première lignes du code PHP permettent de créer deux variables $prenom et $valider
+    à partir des champs de formulaires respectifs, zone de texte et bouton d'envoi.
+    La présence de l'arobas mis au début de chacune de ces deux lignes sera expliquée après.
+    Ensuite j'ai initialisé la variable $message avec une chaîne de caractères vide.
+    C'est cette variable qui sera affichée en bas du formulaire (echo $message).
+
+    la condition if(isset($valider)) signifie si la variable $valider associée au bouton d'envoi existe.
+    En effet, avant de poster le formulaire, aucune des variables $prenom et $valider n'existe encore,
+    car les variables $_POST qu'on leur a affecté ne seront créés qu'une fois le formulaire
+    (utilisant la méthode POST) est envoyé en cliquant le bouton submit.
+    Donc, ce n'est qu'après avoir posté le formulaire que le bloc d'instructions entre
+    les accolades sera exécuté. Ce bloc contient une autre condition qui consiste à vérifier
+    si la variable $prenom, associée à la zone de texte, est vide.
+    Dans ce cas, le message "Prénom invalide" qu'on a mis dans la balise <font>
+        pour le colorer en rouge sera affecté à la variable $message. Si $prenom n'est pas vide
+        alors la chaîne "Prénom valide" coloré en vert sera affecté à la variable $message.
+
+        Masquage des messages d'erreur
+        Revenons maintenant aux arobas (@). Comme je l'ai précisé dans le paragraphe précédent,
+        aucune des deux variables (tableaux) $_POST n'existe avant de poster le formulaire.
+        Dans ce cas, au premier chargement de la page, les clés "prenom" et "valider" que contiennent
+        les crochés ne seront pas reconnus par le compilateur PHP qui générera des erreurs de notification
+        disant "Indefined index prenom" et "Indefined index valider". Ces erreurs n'interrompent pas
+        l’exécution du script, mais la présence de ces deux messages d'erreur dans la page ne sera pas
+        appréciée. Il existe donc deux solution, soit interdire l'affichage des erreurs en manipulant
+        le fameux fichier php.ini (chose fortement déconseillée lors de la phase développement)
+        ou bien masquer les messages d'erreur en utilisant le symbole arobas (@) avant l'instruction
+        qui la cause. C'est cette deuxième méthode qui me parait plus appropriée dans ce cas.
+
+
+
+
+        Les tableaux
+
+        <?php
+        $tab = array("PHP", "Coté serveur", 60);
+        foreach ($tab as $elem) {
+            echo "$elem <br />";
+        }
+        ?>
+        Ce qui donne:
+
+        <!-- //PHP
+    //Coté serveur
+    //60 -->
+
+        Si le tableau est associatif et on veut prendre en compte la valeur des clés alors
+        le code ressemblera à ceci:
+        <?php
+        $tab = array(
+            "langage" => "PHP",
+            "execution" => "Coté serveur",
+            "heures" => 60
+        );
+        foreach ($tab as $cle => $elem) {
+            echo "$cle: $elem <br />";
+        }
+        ?>
+        Ce qui donne:
+        langage: PHP
+        execution: Coté serveur
+        heures: 60
+
+
+        Les fonctionns
+
+        En PHP il est possible de créer ses propres fonctions. Les fonctions sont utiles
+        lorsqu'on est amené à répéter le même traitement plusieurs fois.
+        Au lieu de réécrire le code à chaque reprise, on met celui ci dans une fonction
+        qu'on appellera quand on en aura besoin. Même si une fonction répète le même traitement,
+        elle peut changer de comportement d'un appel à un autre en lui passant des arguments différents
+        à chaque fois.
+
+        function nomDeLaFonction($arg1,$arg2...){
+        CorpsDeLaFonction;
+        return $valeurDeRetour;
+        }
+
+
+
+        Une fonction peut ou non retourner une valeur (ou plusieurs valeurs dans une variable de type tableau).
+
+        Pour appeler une fonction il suffit d'écrier son nom (et la liste des arguments si elle en contient).
+
+        Exemple:
+        <?php
+        function daj()
+        {
+            echo date("d/m/Y");
+        }
+        ?>
+        Si la fonction daj() est appelée elle affichera la date d'aujourd'hui (par exemple: 07/01/2016).
+        Elle ne reçoit aucun argument et ne retourne aucune valeur.
+
+        Pour appeler la fonction daj() il suffit de faire:
+        <?php
+        daj();   //afiche  07/01/2016
+        ?>
+
+
+        Variables Globales
+
+
+        Exemple:
+
+        <?php
+        $a = "Salut";
+        function f()
+        {
+            $b = " à tous";
+            echo $a;
+            //      echo " ".$b." ! ";    // erreur car b n'est pas déclaré au niveau local
+        }
+        f();
+        echo $b;
+        ?>
+
+
+        La variable $a déclarée à l'extérieur de la fonction n'est pas reconnue à l'intérieur de celle-ci.
+        Au moment de son appel, la fonction f() essaiera d'afficher la variable locale $a qui n'existe pas.
+        La variable $b initialisée à l'intérieur de la fonction est locale à celle-ci également.
+        Alors rien ne s'affichera avec echo $b;.
+
+        Par défaut, une variable initialisée à l'intérieur d'une fonction est locale à cette fonction.
+        Si on veut qu'elle soit globale, alors on la déclare avec le mot clé global.
+
+        Pour que l'exemple précédent fonctionne comme prévu on doit le modifier en y insérant
+        $GLOBALS et global:
+
+        <?php
+        $a = "Salut";
+        function f()
+        {
+            global $b;
+            $b = " à tous";
+            echo $GLOBALS["a"];
+        }
+        f();
+        echo $b;
+        ?>
+        Maintenant les deux variables sont bien visibles dans toute la portée du script.
+        Ce qui donne:
+        Salut à tous
+
+        Structure include
+        <!-- Le fichier inclus peut contenir des instructions PHP ou HTML (ou autre langage). Il faudra ajouter un point virgule -->
+        La structure include permet d'appeler un fichier dans la page où elle a été déclarée.
+        On la prend à tort pour une fonction, mais en réalité il s'agit d'un structure et par conséquent,
+        les parenthèses ne sont pas obligatoire.
+
+        La syntaxe de la structure include ressemble à ceci:
+        <?php
+        include "fichier_à_inclure";
+        // ou bien
+        include("fichier_à_inclure");
+        ?>
+
+        Structure require
+
+        La structure require se contente uniquement de vérifier si le fichier existe avant de tenter de le charger.
+        Cette fois ci nous avons besoin des parenthèse :
+        require ("fichier_à_inclure") ;
+        Si le fichier existe, il sera inclus sinon une erreur se produira.
+        Les fichiers peuvent être inclus plusieurs fois sans problème.
+        
+
+ Arrêt prématuré avec exit() et die()
+
+ Les fonction exit() et die() sont similaires (des alias). 
+ Elles arrêtent le programme à l'endroit où elle sont déclarées en affichant le message passé 
+ en argument (en tant que chaîne de caractères).
+
+Exemple:
+<?php
+   for($i=1;$i<=10;$i++){
+      if($i>5)
+         die("Fin");
+      echo "Ligne $i <br />";
+   }
+?>
+Ce qui donne:
+Ligne 1
+Ligne 2
+Ligne 3
+Ligne 4
+Ligne 5
+Fin
+
+les Sessions
+Les sessions permettent de stocker des données sur le serveur lorsqu’une personne est connectée au site web.
+Ces informations resteront disponibles jusqu’à ce qu’elles soient explicitement effacées du système
+(par exemple après inactivité longue), ou jusqu’à ce qu’elle soit fermée manuellement par
+l’utilisateur.
+Il y a deux types de session :
+- Session courante
+- Session persistante
+
+<?php
+   session_start();
+?>
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="UTF-8" />
+   </head>
+   <body>
+   
+   </body>
+</html>
+
+Session_destroy()
+
+
+Exemple
+Code de "page1.php":
+<?php
+   session_start();
+   $_SESSION["theme"]="vert";
+?>
+Code de "page2.php":
+<?php
+   session_start();
+   echo $_SESSION["theme"];
+?>
+Code de "page3.php":
+<?php
+   session_start();
+   session_destroy();
+?>
+
