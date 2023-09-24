@@ -1,30 +1,57 @@
-
 <?php
+   // Démarrer ou reprendre la session PHP en cours.
+   session_start();
 
-include("connexion.php");
+   // Récupérer les valeurs des champs de formulaire (nom, prénom, login, pass, repass, valider)
+   // soumises via la méthode POST et stocker ces valeurs dans des variables correspondantes,
+   // en supprimant les notifications d'erreur avec "@".
+   @$nom=$_POST["nom"];
+   @$prenom=$_POST["prenom"];
+   @$login=$_POST["login"];
+   @$pass=$_POST["pass"];
+   @$repass=$_POST["repass"];
+   @$valider=$_POST["valider"];
 
-$message = '';
+   // Initialiser une variable $erreur vide qui sera utilisée pour stocker d'éventuels messages d'erreur.
+   $erreur="";
 
-if (isset($_POST['username']) && isset($_POST['password'])) {
-    $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $email = $_POST['email'];
+   // Vérifier si le bouton de validation du formulaire a été soumis.
+   if(isset($valider)){
 
-    $sql = "INSERT INTO users (email, username, password) VALUES (:email, :username, :password)";
-    $stmt = $con->prepare($sql);
-    
-    $result = $stmt->execute(['email' => $email, 'username' => $username, 'password' => $password]);
+      // Vérifier si l'un des champs obligatoires est vide et stocker un message d'erreur approprié.
+      if(empty($nom)) $erreur="Nom laissé vide!";
+      elseif(empty($prenom)) $erreur="Prénom laissé vide!";
+      // Il y a une répétition ici, vous pouvez supprimer cette ligne.
+      elseif(empty($prenom)) $erreur="Prénom laissé vide!";
+      elseif(empty($login)) $erreur="Email laissé vide!";
+      elseif(empty($pass)) $erreur="Mot de passe laissé vide!";
+      elseif($pass!=$repass) $erreur="Mots de passe non identiques!";
 
+      // Si tous les champs sont remplis et les mots de passe sont identiques, continuer le traitement.
+      else{
+         // Inclure un fichier (probablement pour la gestion de la base de données).
+         include("connexion.php");
 
-    if ($result) {
-        $message = 'Inscription réussie!';
-        header('Location: login.php');
-    } else {
-        $message = 'Erreur lors de l\'inscription.';
-    }
-}
+         // Préparer une requête SQL pour vérifier si le login existe déjà dans la base de données.
+         $sel=$pdo->prepare("select id from utilisateurs where login=? limit 1");
+         $sel->execute(array($login));
+         $tab=$sel->fetchAll();
 
+         // Vérifier si le login existe déjà dans la base de données.
+         if(count($tab)>0)
+            $erreur="Login existe déjà!";
+         else{
+            // Si le login est unique, préparer une requête SQL pour insérer les données dans la table "utilisateurs".
+            $ins=$pdo->prepare("insert into utilisateurs(nom,prenom,login,pass) values(?,?,?,?)");
+
+            // Exécuter la requête SQL en liant les valeurs de $nom, $prenom, $login et le mot de passe haché (md5($pass)).
+            if($ins->execute(array($nom,$prenom,$login,md5($pass))))
+               header("location:login.php"); // Rediriger vers la page de connexion en cas de succès.
+         }   
+      }
+   }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -102,11 +129,10 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 </head>
 
 <body>
-    <div class="container">
         <?php include 'header.php' ?>
         <div class="container col-xl-12 col-xxl-10 px-6 py-5">
             <div class="row align-items-center g-lg-5 py-5">
-            <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3 text-lg-center">S'inscrire</h1>
+                <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3 text-lg-center">S'inscrire</h1>
                 <div class="col-lg-6 text-center text-lg-center">
                     <!-- <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Register</h1> -->
                     <p class="col-lg-10 fs-4">
@@ -114,34 +140,41 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                     </p>
                 </div>
                 <div class="col-lg-6 text-center text-lg-start ">
-                        <?php if (!empty($message)): ?>
-                            <p class="message" style="color:red"><?= $message ?></p>
-                        <?php endif; ?>
-                       <form class="p-4 p-md-7 " action="inscription.php" method="post">
+
+                    <form class="p-4 p-md-7 " action="inscription.php" method="post">
                         <!-- <fieldset> -->
-                            <!-- <legend>Inscription</legend> -->
-                            <div class="label">Username</div>
-                            <div class="champ">
-                                <input type="text" name="username" value="<?php echo $username ?>" />
-                            </div>
-                            <div class="label">Email</div>
-                            <div class="champ">
-                                <input type="text" name="email" value="<?php echo $email ?>" />
-                            </div>
-                            <div class="label">Mot de passe</div>
-                            <div class="champ">
-                                <input type="password" name="password" value="<?php echo $password ?>" />
-                            </div>
-                          
-                            <div class="champ">
-                                <input type="submit" name="valider" value="Valider l'inscription" />
-                            </div>
+                        <!-- <legend>Inscription</legend> -->
+                        <?php if (!empty($erreur)) : ?>
+                            <p class="message" style="color:red"><?= $erreur ?></p>
+                        <?php endif; ?>
+                        <div class="label">Nom</div>
+                        <div class="champ">
+                            <input type="text" name="nom" value="<?php echo $nom ?>" />
+                        </div>
+                        <div class="label">Prenom</div>
+                        <div class="champ">
+                            <input type="text" name="prenom" value="<?php echo $prenom ?>" />
+                        </div>
+                        <div class="label">Email</div>
+                        <div class="champ">
+                            <input type="email" name="login" value="<?php echo $login ?>" />
+                        </div>
+                        <div class="label">Mot de passe</div>
+                        <div class="champ">
+                            <input type="password" name="pass" value="<?php echo $pass ?>"/>
+                        </div>
+                        <div class="label">Confirmer mot de passe</div>
+                        <div class="champ">
+                            <input type="password" name="repass" />
+                        </div>
+                        <div class="champ">
+                            <input type="submit" name="valider" value="Valider l'inscription" />
+                        </div>
                         <!-- </fieldset> -->
                     </form>
                 </div>
             </div>
         </div>
-    </div>
 </body>
 
 </html>
